@@ -29,6 +29,16 @@
 	    <th>release notes</th>  
 	</tr>
 	<tr>
+            <td>0.11.0</td>
+            <td><a href="https://www.apache.org/dyn/closer.cgi/iotdb/0.11.0/apache-iotdb-0.11.0-bin.zip">Release</a></td>
+            <td><a href="https://downloads.apache.org/iotdb/0.11.0/apache-iotdb-0.11.0-bin.zip.sha512">SHA512</a></td>
+            <td><a href="https://downloads.apache.org/iotdb/0.11.0/apache-iotdb-0.11.0-bin.zip.asc">ASC</a></td>
+            <td><a href="https://www.apache.org/dyn/closer.cgi/iotdb/0.11.0/apache-iotdb-0.11.0-source-release.zip">Sources</a></td>
+            <td><a href="https://downloads.apache.org/iotdb/0.11.0/apache-iotdb-0.11.0-source-release.zip.sha512">SHA512</a></td>
+            <td><a href="https://downloads.apache.org/iotdb/0.11.0/apache-iotdb-0.11.0-source-release.zip.asc">ASC</a></td>
+            <td><a href="https://raw.githubusercontent.com/apache/iotdb/release/0.11.0/RELEASE_NOTES.md">release notes</a></td>
+      </tr>
+	<tr>
           <td>0.10.1</td>
           <td><a href="https://www.apache.org/dyn/closer.cgi/iotdb/0.10.1-incubating/apache-iotdb-0.10.1-incubating-bin.zip">Release</a></td>
           <td><a href="https://downloads.apache.org/iotdb/0.10.1-incubating/apache-iotdb-0.10.1-incubating-bin.zip.sha512">SHA512</a></td>
@@ -69,13 +79,25 @@
   with what you set in the old version.
   * stop the old vesion instance, and start the new one.
 
+- - How to upgrade from v.10.x to v0.11.x?
+    * The data format (i.e., TsFile data) of v0.10.x and v0.11 are compatible, but the WAL file is incompatible.
+    * So, you can follow the steps:
+    * Stop writing new data.
+    * Call `flush` command using sbin/start-cli.sh in v0.10.x to close all TsFiles.
+    * We recommend to backup the the wal files and mlog.txt before upgrading for rolling back.
+    * Just download, unzip v0.11.x.zip, and modify conf/iotdb-engine.proeprties to let all the 
+    directories point to the data folder set in v0.10.x  (or the backup folder). 
+    You can also modify other settings if you want. 
+    * Stop IoTDB v0.10.x instance, and start v0.11.x, then the IoTDB will upgrade data file format automatically.
+    * __NOTICE: V0.11 changes many settings in conf/iotdb-engine.properties, so do not use v0.10's configuration file directly.__
+
 - How to upgrade from v.9.x to v0.10.x?
   * Upgrading from v0.9 to v0.10 is more complex than v0.8 to v0.9.
   * Stop writing new data.
   * Call `flush` command using sbin/start-client.sh in v0.9 to close all TsFiles.
   * We recommend to backup the data file (also the wal files and mlog.txt) before upgrading for rolling back.
   * Just download, unzip v0.10.x.zip, and modify conf/iotdb-engine.proeprties to let all the 
-  directories point to the folders set in v0.9.x  (or the backup folder). 
+  directories point to the data folder set in v0.9.x  (or the backup folder). 
   You can also modify other settings if you want. 
   * Stop IoTDB v0.9 instance, and start v0.10.x, then the IoTDB will upgrade data file format automatically.
 
