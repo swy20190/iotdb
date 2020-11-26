@@ -85,7 +85,7 @@
                                 <goals>
                                     <goal>copy</goal>
                                 </goals>
-                                <phase>generate-sources</phase>
+                                <phase>compile</phase>
                                 <configuration>
                                     <fileset>
                                         <directory>${project.build.directory}/download/website.zip/iotdb-website-asf-site/UserGuide</directory>
@@ -98,7 +98,7 @@
                                 <goals>
                                     <goal>copy</goal>
                                 </goals>
-                                <phase>generate-sources</phase>
+                                <phase>compile</phase>
                                 <configuration>
                                     <fileset>
                                         <directory>${project.build.directory}/download/website.zip/iotdb-website-asf-site/zh/UserGuide</directory>
@@ -323,24 +323,24 @@
                             <!-- remove files if `existing` folder exist-->
                             <execution>
                                 <id>clean-stale-master-doc</id>
-                                <phase>generate-sources</phase>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>rename</goal>
                                 </goals>
                                 <configuration>
                                     <sourceFile>${project.build.directory}/existing/UserGuide/Master</sourceFile>
-                                    <destinationFile>${project.build.directory}/abandon/UserGuide/Master</destinationFile>
+                                    <destinationFile>${project.build.directory}/existing/Master</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
                                 <id>clean-stale-master-zh-doc</id>
-                                <phase>generate-sources</phase>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>rename</goal>
                                 </goals>
                                 <configuration>
                                     <sourceFile>${project.build.directory}/existing/zh/UserGuide/Master</sourceFile>
-                                    <destinationFile>${project.build.directory}/abandon/zh/UserGuide/Master</destinationFile>
+                                    <destinationFile>${project.build.directory}/existing/zh/Master</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
@@ -372,7 +372,6 @@
                                 <goals>
                                     <goal>npm</goal>
                                 </goals>
-                                <!-- optional: default phase is "generate-resources" -->
                                 <phase>compile</phase>
                                 <!-- Optional configuration which provides for running any npm command -->
                                 <configuration>
@@ -402,7 +401,7 @@
                             <scmBranch>asf-site</scmBranch>
                         </configuration>
                     </plugin>
-                    <plugin>
+                    <!--<plugin>
                         <groupId>org.simplify4u.plugins</groupId>
                         <artifactId>sitemapxml-maven-plugin</artifactId>
                         <version>2.0.0</version>
@@ -418,7 +417,7 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
+                    </plugin>-->
                 </plugins>
             </build>
         </profile>
@@ -495,7 +494,7 @@
                                 </goals>
                                 <configuration>
                                     <sourceFile>${project.build.directory}/existing/UserGuide/V0.11.x</sourceFile>
-                                    <destinationFile>${project.build.directory}/abandon/UserGuide/V0.11.x</destinationFile>
+                                    <destinationFile>${project.build.directory}/existing/V0.11.x</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -506,7 +505,7 @@
                                 </goals>
                                 <configuration>
                                     <sourceFile>${project.build.directory}/existing/zh/UserGuide/V0.11.x</sourceFile>
-                                    <destinationFile>${project.build.directory}/abandon/zh/UserGuide/V0.11.x</destinationFile>
+                                    <destinationFile>${project.build.directory}/existing/zh/V0.11.x</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
@@ -587,7 +586,7 @@
                                 </goals>
                                 <configuration>
                                     <sourceFile>${project.build.directory}/existing/UserGuide/V0.10.x</sourceFile>
-                                    <destinationFile>${project.build.directory}/abandon/UserGuide/V0.10.x</destinationFile>
+                                    <destinationFile>${project.build.directory}/existing/V0.10.x</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -598,7 +597,7 @@
                                 </goals>
                                 <configuration>
                                     <sourceFile>${project.build.directory}/existing/zh/UserGuide/V0.10.x</sourceFile>
-                                    <destinationFile>${project.build.directory}/abandon/zh/UserGuide/V0.10.x</destinationFile>
+                                    <destinationFile>${project.build.directory}/existing/zh/V0.10.x</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
@@ -679,7 +678,7 @@
                                 </goals>
                                 <configuration>
                                     <sourceFile>${project.build.directory}/existing/UserGuide/V0.9.x</sourceFile>
-                                    <destinationFile>${project.build.directory}/abandon/UserGuide/V0.9.x</destinationFile>
+                                    <destinationFile>${project.build.directory}/existing/V0.9.x</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -690,7 +689,7 @@
                                 </goals>
                                 <configuration>
                                     <sourceFile>${project.build.directory}/existing/zh/UserGuide/V0.9.x</sourceFile>
-                                    <destinationFile>${project.build.directory}/abandon/zh/UserGuide/V0.9.x</destinationFile>
+                                    <destinationFile>${project.build.directory}/existing/zh/V0.9.x</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
@@ -771,7 +770,7 @@
                                 </goals>
                                 <configuration>
                                     <sourceFile>${project.build.directory}/existing/UserGuide/V0.8.x</sourceFile>
-                                    <destinationFile>${project.build.directory}/abandon/UserGuide/V0.8.x</destinationFile>
+                                    <destinationFile>${project.build.directory}/existing/V0.8.x</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -782,7 +781,7 @@
                                 </goals>
                                 <configuration>
                                     <sourceFile>${project.build.directory}/existing/zh/UserGuide/V0.8.x</sourceFile>
-                                    <destinationFile>${project.build.directory}/abandon/zh/UserGuide/V0.8.x</destinationFile>
+                                    <destinationFile>${project.build.directory}/existing/zh/V0.8.x</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
