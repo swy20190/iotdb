@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
@@ -110,10 +111,8 @@ public class MTree implements Serializable {
       try {
         QueryDataSource dataSource = QueryResourceManager.getInstance().
                 getQueryDataSource(node.getPartialPath(), queryContext, null);
-        Set<String> measurementSet = new HashSet<>();
-        measurementSet.add(node.getPartialPath().getFullPath());
         LastPointReader lastReader = new LastPointReader(node.getPartialPath(),
-                node.getSchema().getType(), measurementSet, queryContext,
+                node.getSchema().getType(), Collections.emptySet(), queryContext,
                 dataSource, Long.MAX_VALUE, null);
         last = lastReader.readLastPoint();
         return (last != null ? last.getTimestamp() : Long.MIN_VALUE);
@@ -1124,6 +1123,9 @@ public class MTree implements Serializable {
   @SuppressWarnings("squid:S3776") // Suppress high Cognitive Complexity warning
   private void findChildNodePathInNextLevel(
       MNode node, String[] nodes, int idx, String parent, Set<String> res, int length) {
+    if (node == null) {
+      return;
+    }
     String nodeReg = MetaUtils.getNodeRegByIdx(idx, nodes);
     if (!nodeReg.contains(PATH_WILDCARD)) {
       if (idx == length) {

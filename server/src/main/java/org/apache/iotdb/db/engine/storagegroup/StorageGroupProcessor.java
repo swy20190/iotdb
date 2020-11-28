@@ -559,7 +559,6 @@ public class StorageGroupProcessor {
     for (int i = 0; i < tsFiles.size(); i++) {
       TsFileResource tsFileResource = tsFiles.get(i);
       long timePartitionId = tsFileResource.getTimePartition();
-
       TsFileRecoverPerformer recoverPerformer = new TsFileRecoverPerformer(
           storageGroupName + FILE_NAME_SEPARATOR,
           getVersionControllerByTimePartitionId(timePartitionId), tsFileResource, isSeq,
@@ -797,11 +796,11 @@ public class StorageGroupProcessor {
    * inserted are in the range [start, end)
    *
    * @param insertTabletPlan insert a tablet of a device
-   * @param sequence whether is sequence
-   * @param start start index of rows to be inserted in insertTabletPlan
-   * @param end end index of rows to be inserted in insertTabletPlan
-   * @param results result array
-   * @param timePartitionId time partition id
+   * @param sequence         whether is sequence
+   * @param start            start index of rows to be inserted in insertTabletPlan
+   * @param end              end index of rows to be inserted in insertTabletPlan
+   * @param results          result array
+   * @param timePartitionId  time partition id
    * @return false if any failure occurs when inserting the tablet, true otherwise
    */
   private boolean insertTabletToTsFileProcessor(InsertTabletPlan insertTabletPlan,
@@ -923,7 +922,7 @@ public class StorageGroupProcessor {
   public void asyncFlushMemTableInTsFileProcessor(TsFileProcessor tsFileProcessor) {
     writeLock();
     try {
-      if (!closingSequenceTsFileProcessor.contains(tsFileProcessor) && 
+      if (!closingSequenceTsFileProcessor.contains(tsFileProcessor) &&
           !closingUnSequenceTsFileProcessor.contains(tsFileProcessor)) {
         fileFlushPolicy.apply(this, tsFileProcessor, tsFileProcessor.isSequence());
       }
@@ -959,9 +958,9 @@ public class StorageGroupProcessor {
   /**
    * get processor from hashmap, flush oldest processor if necessary
    *
-   * @param timeRangeId time partition range
+   * @param timeRangeId            time partition range
    * @param tsFileProcessorTreeMap tsFileProcessorTreeMap
-   * @param sequence whether is sequence or not
+   * @param sequence               whether is sequence or not
    */
   private TsFileProcessor getOrCreateTsFileProcessorIntern(long timeRangeId,
       TreeMap<Long, TsFileProcessor> tsFileProcessorTreeMap,
@@ -1099,7 +1098,7 @@ public class StorageGroupProcessor {
   public void asyncCloseOneTsFileProcessor(boolean sequence, TsFileProcessor tsFileProcessor) {
     //for sequence tsfile, we update the endTimeMap only when the file is prepared to be closed.
     //for unsequence tsfile, we have maintained the endTimeMap when an insertion comes.
-    if (closingSequenceTsFileProcessor.contains(tsFileProcessor) || 
+    if (closingSequenceTsFileProcessor.contains(tsFileProcessor) ||
         closingUnSequenceTsFileProcessor.contains(tsFileProcessor)) {
       return;
     }
@@ -1474,12 +1473,14 @@ public class StorageGroupProcessor {
   /**
    * Delete data whose timestamp <= 'timestamp' and belongs to the time series
    * deviceId.measurementId.
-   *  @param path the timeseries path of the to be deleted.
+   *
+   * @param path      the timeseries path of the to be deleted.
    * @param startTime the startTime of delete range.
-   * @param endTime the endTime of delete range.
+   * @param endTime   the endTime of delete range.
    * @param planIndex
    */
-  public void delete(PartialPath path, long startTime, long endTime, long planIndex) throws IOException {
+  public void delete(PartialPath path, long startTime, long endTime, long planIndex)
+      throws IOException {
     // TODO: how to avoid partial deletion?
     // FIXME: notice that if we may remove a SGProcessor out of memory, we need to close all opened
     //mod files in mergingModification, sequenceFileList, and unsequenceFileList
@@ -1555,11 +1556,12 @@ public class StorageGroupProcessor {
   }
 
   private boolean canSkipDelete(TsFileResource tsFileResource, Set<PartialPath> devicePaths,
-       long deleteStart, long deleteEnd) {
+      long deleteStart, long deleteEnd) {
     for (PartialPath device : devicePaths) {
       if (tsFileResource.containsDevice(device.getFullPath()) &&
-              (deleteEnd >= tsFileResource.getStartTime(device.getFullPath()) &&
-               deleteStart <= tsFileResource.getOrDefaultEndTime(device.getFullPath(), Long.MAX_VALUE))) {
+          (deleteEnd >= tsFileResource.getStartTime(device.getFullPath()) &&
+              deleteStart <= tsFileResource
+                  .getOrDefaultEndTime(device.getFullPath(), Long.MAX_VALUE))) {
         return false;
       }
     }
@@ -1568,9 +1570,10 @@ public class StorageGroupProcessor {
 
   private void deleteDataInFiles(Collection<TsFileResource> tsFileResourceList, Deletion deletion,
       Set<PartialPath> devicePaths, List<ModificationFile> updatedModFiles, long planIndex)
-          throws IOException {
+      throws IOException {
     for (TsFileResource tsFileResource : tsFileResourceList) {
-      if (canSkipDelete(tsFileResource, devicePaths, deletion.getStartTime(), deletion.getEndTime())) {
+      if (canSkipDelete(tsFileResource, devicePaths, deletion.getStartTime(),
+          deletion.getEndTime())) {
         continue;
       }
 
@@ -1604,7 +1607,8 @@ public class StorageGroupProcessor {
       MNode node = IoTDB.metaManager.getDeviceNode(deviceId);
 
       for (MNode measurementNode : node.getChildren().values()) {
-        if (measurementNode != null && originalPath.matchFullPath(measurementNode.getPartialPath())) {
+        if (measurementNode != null && originalPath
+            .matchFullPath(measurementNode.getPartialPath())) {
           TimeValuePair lastPair = ((MeasurementMNode) measurementNode).getCachedLast();
           if (lastPair != null && startTime <= lastPair.getTimestamp()
               && lastPair.getTimestamp() <= endTime) {
@@ -2092,9 +2096,9 @@ public class StorageGroupProcessor {
    * returns directly; otherwise, the time stamp is the mean of the timestamps of the two files, the
    * version number is the version number in the tsfile with a larger timestamp.
    *
-   * @param tsfileName origin tsfile name
+   * @param tsfileName  origin tsfile name
    * @param insertIndex the new file will be inserted between the files [insertIndex, insertIndex +
-   * 1]
+   *                    1]
    * @return appropriate filename
    */
   private String getFileNameForLoadingFile(String tsfileName, int insertIndex,
@@ -2158,8 +2162,8 @@ public class StorageGroupProcessor {
   /**
    * Execute the loading process by the type.
    *
-   * @param type load type
-   * @param tsFileResource tsfile resource to be loaded
+   * @param type            load type
+   * @param tsFileResource  tsfile resource to be loaded
    * @param filePartitionId the partition id of the new file
    * @return load the file successfully
    * @UsedBy sync module, load external tsfile module.

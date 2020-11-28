@@ -36,9 +36,9 @@
 * IOTDB-926 Support reconnection of Session
 * IOTDB-941 Support 'delete storage group <prefixPath>'
 * IOTDB-968 Support time predicate in select last, e.g., select last * from root where time >= T
-* Show alias if it is used in query
+* Support alias if it is used in query (e.g., select s1 as temp from root.a.b)
 * Add level compaction strategy
-* Add partialInsert
+* Enable partial insert (some failed inserted columns do not impact others)
 
 ## Incompatible changes
 

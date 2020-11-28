@@ -376,7 +376,7 @@ public class MManager {
         }
         // two time series may set one storage group concurrently,
         // that's normal in our concurrency control protocol
-        catch (MetadataException e){
+        catch (MetadataException e) {
           logger.info("concurrently operate set storage group cmd {} twice", cmd);
         }
         break;
@@ -571,7 +571,7 @@ public class MManager {
     // TODO: delete the path node and all its ancestors
     mNodeCache.clear();
     totalSeriesNumber.addAndGet(-1);
-    if (!allowToCreateNewSeries && 
+    if (!allowToCreateNewSeries &&
         totalSeriesNumber.get() * ESTIMATED_SERIES_SIZE < MTREE_SIZE_THRESHOLD) {
       logger.info("Current series number {} come back to normal level", totalSeriesNumber);
       allowToCreateNewSeries = true;
@@ -605,7 +605,7 @@ public class MManager {
       for (PartialPath storageGroup : storageGroups) {
         totalSeriesNumber.addAndGet(mtree.getAllTimeseriesCount(storageGroup));
         // clear cached MNode
-        if (!allowToCreateNewSeries && 
+        if (!allowToCreateNewSeries &&
             totalSeriesNumber.get() * ESTIMATED_SERIES_SIZE < MTREE_SIZE_THRESHOLD) {
           logger.info("Current series number {} come back to normal level", totalSeriesNumber);
           allowToCreateNewSeries = true;
@@ -1784,8 +1784,9 @@ public class MManager {
         if (measurementMNode.getSchema().getType() != insertDataType) {
           logger.warn("DataType mismatch, Insert measurement {} type {}, metadata tree type {}",
               measurementList[i], insertDataType, measurementMNode.getSchema().getType());
-          DataTypeMismatchException mismatchException = new DataTypeMismatchException(measurementList[i],
-                  insertDataType, measurementMNode.getSchema().getType());
+          DataTypeMismatchException mismatchException = new DataTypeMismatchException(
+              measurementList[i],
+              insertDataType, measurementMNode.getSchema().getType());
           if (!config.isEnablePartialInsert()) {
             throw mismatchException;
           } else {

@@ -201,7 +201,8 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
         .newSingleThreadScheduledExecutor(r -> new Thread(r, "timedQuerySqlCountThread"));
     timedQuerySqlCountThread.scheduleAtFixedRate(() -> {
           if (queryCount.get() != 0) {
-            QUERY_FREQUENCY_LOGGER.info("Query count in current 1 minute: " + queryCount.getAndSet(0));
+            QUERY_FREQUENCY_LOGGER
+                .info("Query count in current 1 minute: " + queryCount.getAndSet(0));
           }
         },
         config.getFrequencyIntervalInMinute(), config.getFrequencyIntervalInMinute(),
@@ -753,16 +754,14 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
       Measurement.INSTANCE.addOperationLatency(Operation.EXECUTE_QUERY, startTime);
       long costTime = System.currentTimeMillis() - startTime;
       if (costTime >= config.getSlowQueryThreshold()) {
-        SLOW_SQL_LOGGER.info("Cost: {} ms, sql is {}", costTime, statement);
+        SLOW_SQL_LOGGER.info("Cost: " + costTime + " ms, sql is " + statement);
       }
       if (config.isDebugOn()) {
-        SLOW_SQL_LOGGER.info(
-            "ChunkCache used memory proportion: {}\nChunkMetadataCache used memory proportion: {}\n"
-                + "TimeSeriesMetadataCache used memory proportion: {}",
-            ChunkCache.getInstance()
-                .getUsedMemoryProportion(),
-            ChunkMetadataCache.getInstance().getUsedMemoryProportion(), TimeSeriesMetadataCache
-                .getInstance().getUsedMemoryProportion());
+        SLOW_SQL_LOGGER.info("ChunkCache used memory proportion: " + ChunkCache.getInstance()
+            .getUsedMemoryProportion() + "\nChunkMetadataCache used memory proportion: "
+            + ChunkMetadataCache.getInstance().getUsedMemoryProportion()
+            + "\nTimeSeriesMetadataCache used memory proportion: " + TimeSeriesMetadataCache
+            .getInstance().getUsedMemoryProportion());
       }
     }
   }
@@ -1255,7 +1254,6 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
 
     List<TSStatus> statusList = new ArrayList<>();
     InsertRowPlan plan = new InsertRowPlan();
-    boolean isAllSuccessful = true;
     for (int i = 0; i < req.deviceIds.size(); i++) {
       try {
         plan.setDeviceId(new PartialPath(req.getDeviceIds().get(i)));
@@ -1266,25 +1264,18 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
         plan.fillValues(req.valuesList.get(i));
         plan.setNeedInferType(false);
         TSStatus status = checkAuthority(plan, req.getSessionId());
-        if (status == null) {
-          status = executeNonQueryPlan(plan);
-          isAllSuccessful =
-              ((status.getCode() == TSStatusCode.SUCCESS_STATUS.getStatusCode())
-                  && isAllSuccessful);
+        if (status != null) {
+          statusList.add(status);
+        } else {
+          statusList.add(executeNonQueryPlan(plan));
         }
-        statusList.add(status);
       } catch (Exception e) {
         logger.error("meet error when insert in batch", e);
-        isAllSuccessful = false;
         statusList.add(RpcUtils.getStatus(TSStatusCode.INTERNAL_SERVER_ERROR));
       }
     }
 
-    if (!isAllSuccessful) {
-      return RpcUtils.getStatus(statusList);
-    }
-
-    return RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS);
+    return RpcUtils.getStatus(statusList);
   }
 
   @Override
@@ -1301,7 +1292,6 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
 
     List<TSStatus> statusList = new ArrayList<>();
     InsertRowPlan plan = new InsertRowPlan();
-    boolean isAllSuccessful = true;
     for (int i = 0; i < req.deviceIds.size(); i++) {
       try {
         plan.setDeviceId(new PartialPath(req.getDeviceIds().get(i)));
@@ -1312,25 +1302,18 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
             req.getValuesList().get(i).toArray(new Object[req.getValuesList().get(i).size()]));
         plan.setNeedInferType(true);
         TSStatus status = checkAuthority(plan, req.getSessionId());
-        if (status == null) {
-          status = executeNonQueryPlan(plan);
-          isAllSuccessful =
-              ((status.getCode() == TSStatusCode.SUCCESS_STATUS.getStatusCode())
-                  && isAllSuccessful);
+        if (status != null) {
+          statusList.add(status);
+        } else {
+          statusList.add(executeNonQueryPlan(plan));
         }
-        statusList.add(status);
       } catch (Exception e) {
         logger.error("meet error when insert in batch", e);
-        isAllSuccessful = false;
         statusList.add(RpcUtils.getStatus(TSStatusCode.INTERNAL_SERVER_ERROR));
       }
     }
 
-    if (!isAllSuccessful) {
-      return RpcUtils.getStatus(statusList);
-    }
-
-    return RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS);
+    return RpcUtils.getStatus(statusList);
   }
 
   @Override
@@ -1501,7 +1484,6 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
       }
 
       List<TSStatus> statusList = new ArrayList<>();
-      boolean isAllSuccessful = true;
       for (int i = 0; i < req.deviceIds.size(); i++) {
         InsertTabletPlan insertTabletPlan = new InsertTabletPlan(
             new PartialPath(req.deviceIds.get(i)),
@@ -1516,18 +1498,14 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
         insertTabletPlan.setDataTypes(req.typesList.get(i));
 
         TSStatus status = checkAuthority(insertTabletPlan, req.getSessionId());
-        if (status == null) {
-          status = executeNonQueryPlan(insertTabletPlan);
-          isAllSuccessful =
-              ((status.getCode() == TSStatusCode.SUCCESS_STATUS.getStatusCode())
-                  && isAllSuccessful);
+        if (status != null) {
+          statusList.add(status);
+          continue;
         }
-        statusList.add(status);
+
+        statusList.add(executeNonQueryPlan(insertTabletPlan));
       }
-      if (!isAllSuccessful) {
-        return RpcUtils.getStatus(statusList);
-      }
-      return RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS);
+      return RpcUtils.getStatus(statusList);
     } catch (Exception e) {
       logger.error("{}: error occurs when insertTablets", IoTDBConstant.GLOBAL_DB_NAME, e);
       return RpcUtils
@@ -1769,15 +1747,14 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
   protected TSStatus executeNonQueryPlan(PhysicalPlan plan) {
     boolean execRet;
     try {
-      plan.checkIntegrity();
       execRet = executeNonQuery(plan);
     } catch (BatchInsertionException e) {
       return RpcUtils.getStatus(Arrays.asList(e.getFailingStatus()));
     } catch (QueryProcessException e) {
-      logger.error("meet error while processing non-query. ", e);
+      logger.warn("meet error while processing non-query. ", e);
       return RpcUtils.getStatus(e.getErrorCode(), e.getMessage());
     } catch (Exception e) {
-      logger.error(SERVER_INTERNAL_ERROR, IoTDBConstant.GLOBAL_DB_NAME, e);
+      logger.warn(SERVER_INTERNAL_ERROR, IoTDBConstant.GLOBAL_DB_NAME, e);
       return RpcUtils.getStatus(TSStatusCode.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
