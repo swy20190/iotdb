@@ -50,6 +50,11 @@
         <!-- The version of thrift is overridden because using 0.13.0 in the cluster module
         will cause unclear bugs -->
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.thrift</groupId>
             <artifactId>libthrift</artifactId>
             <version>0.12.0</version>

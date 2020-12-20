@@ -58,9 +58,31 @@ public class HeartbeatThread implements Runnable {
   private Random random = new Random();
   boolean hasHadLeader = false;
 
+  private SlideWindow slideWindow;
+  private boolean usePhi = false;
+  private double bigPhi = 16.0;
+
+
   HeartbeatThread(RaftMember localMember) {
     this.localMember = localMember;
     memberName = localMember.getName();
+  }
+
+  // use phi-accrual detector
+  HeartbeatThread(RaftMember localMember, boolean usePhi, int phi_window_size, double bigPhi){
+    this.localMember = localMember;
+    memberName = localMember.getName();
+    slideWindow = new SlideWindow(phi_window_size);
+    this.usePhi = usePhi;
+    this.bigPhi = bigPhi;
+  }
+
+  public void setMinSlideWindowSD(double minSD){
+    this.slideWindow.setMinSD(minSD);
+  }
+
+  public void setBigPhi(double bigPhi){
+    this.bigPhi = bigPhi;
   }
 
   @Override
@@ -86,9 +108,20 @@ public class HeartbeatThread implements Runnable {
             break;
           case FOLLOWER:
             // check if heartbeat times out
-            long heartBeatInterval = System.currentTimeMillis() - localMember
+            long curr_stamp = System.currentTimeMillis();
+            long heartBeatInterval = curr_stamp - localMember
                 .getLastHeartbeatReceivedTime();
-            if (heartBeatInterval >= RaftServer.getConnectionTimeoutInMS()) {
+            boolean nodeAvailable = false;
+            if(!usePhi){
+              nodeAvailable = heartBeatInterval >= RaftServer.getConnectionTimeoutInMS();
+            }
+            else{
+              double phi = slideWindow.phi(curr_stamp);
+              logger.info("{}: The phi value is {}", memberName, phi);
+              nodeAvailable = phi>bigPhi;
+              slideWindow.addTime(curr_stamp);
+            }
+            if (nodeAvailable) {
               // the leader is considered dead, an election will be started in the next loop
               logger.info("{}: The leader {} timed out", memberName, localMember.getLeader());
               localMember.setCharacter(NodeCharacter.ELECTOR);
